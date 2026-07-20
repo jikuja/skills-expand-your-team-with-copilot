@@ -28,9 +28,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Dark mode elements
   const darkModeToggle = document.getElementById("dark-mode-toggle");
 
-  // Initialize dark mode from localStorage
-  function initDarkMode() {
-    if (localStorage.getItem("darkMode") === "enabled") {
+  // Apply the dark/light theme and update the toggle button to match
+  function applyTheme(isDark) {
+    if (isDark) {
       document.documentElement.setAttribute("data-theme", "dark");
       darkModeToggle.textContent = "☀️";
       darkModeToggle.setAttribute("aria-label", "Switch to light mode");
@@ -41,21 +41,14 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  darkModeToggle.addEventListener("click", () => {
-    if (document.documentElement.getAttribute("data-theme") === "dark") {
-      document.documentElement.removeAttribute("data-theme");
-      localStorage.setItem("darkMode", "disabled");
-      darkModeToggle.textContent = "🌙";
-      darkModeToggle.setAttribute("aria-label", "Switch to dark mode");
-    } else {
-      document.documentElement.setAttribute("data-theme", "dark");
-      localStorage.setItem("darkMode", "enabled");
-      darkModeToggle.textContent = "☀️";
-      darkModeToggle.setAttribute("aria-label", "Switch to light mode");
-    }
-  });
+  // Sync the toggle button with the theme already set by the inline head script
+  applyTheme(localStorage.getItem("darkMode") === "enabled");
 
-  initDarkMode();
+  darkModeToggle.addEventListener("click", () => {
+    const isDark = document.documentElement.getAttribute("data-theme") !== "dark";
+    localStorage.setItem("darkMode", isDark ? "enabled" : "disabled");
+    applyTheme(isDark);
+  });
 
   // Activity categories with corresponding colors
   const activityTypes = {

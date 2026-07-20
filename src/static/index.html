@@ -6,6 +6,7 @@
     <title>Mergington High School Activities</title>
     <link rel="stylesheet" href="styles.css" />
     <script>
+      /* Applied before CSS renders to prevent a flash of unstyled content (FOUC) */
       if (localStorage.getItem("darkMode") === "enabled") {
         document.documentElement.setAttribute("data-theme", "dark");
       }
