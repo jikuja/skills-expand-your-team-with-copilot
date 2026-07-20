@@ -34,6 +34,9 @@ document.addEventListener("DOMContentLoaded", () => {
     technology: { label: "Technology", color: "#e8eaf6", textColor: "#3949ab" },
   };
 
+  // School name used in sharing text
+  const SCHOOL_NAME = "Mergington High School";
+
   // State for activities and filters
   let allActivities = {};
   let currentFilter = "all";
@@ -621,7 +624,7 @@ document.addEventListener("DOMContentLoaded", () => {
   // Build a shareable text and URL for an activity
   function buildShareContent(name, details) {
     const schedule = formatSchedule(details);
-    const shareTitle = `Check out "${name}" at Mergington High School!`;
+    const shareTitle = `Check out "${name}" at ${SCHOOL_NAME}!`;
     const text = `${shareTitle}\n${details.description}\nSchedule: ${schedule}`;
     const url = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
     return { title: shareTitle, text, url };
@@ -633,7 +636,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (navigator.share) {
       navigator
-        .share({ title: title, text: text, url: url })
+        .share({ title, text, url })
         .catch(() => {
           // User cancelled or API unsupported — silently ignore
         });
@@ -663,6 +666,13 @@ document.addEventListener("DOMContentLoaded", () => {
         title
       )}&body=${encodeURIComponent(text + "\n\n" + url)}`;
     } else if (platform === "copy") {
+      if (!navigator.clipboard) {
+        showMessage(
+          "Copying is not supported in this browser. Please copy the URL from the address bar.",
+          "error"
+        );
+        return;
+      }
       navigator.clipboard
         .writeText(url)
         .then(() => showMessage("Link copied to clipboard!", "success"))
