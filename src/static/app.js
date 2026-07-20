@@ -621,14 +621,15 @@ document.addEventListener("DOMContentLoaded", () => {
   // Build a shareable text and URL for an activity
   function buildShareContent(name, details) {
     const schedule = formatSchedule(details);
-    const text = `Check out "${name}" at Mergington High School!\n${details.description}\nSchedule: ${schedule}`;
+    const shareTitle = `Check out "${name}" at Mergington High School!`;
+    const text = `${shareTitle}\n${details.description}\nSchedule: ${schedule}`;
     const url = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
-    return { text, url };
+    return { title: shareTitle, text, url };
   }
 
   // Open share dropdown, or use native Web Share API if available
   function shareActivity(name, details, dropdown) {
-    const { text, url } = buildShareContent(name, details);
+    const { title, text, url } = buildShareContent(name, details);
 
     if (navigator.share) {
       navigator
@@ -649,7 +650,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // Execute a specific share action
   function executeShare(platform, name, details) {
-    const { text, url } = buildShareContent(name, details);
+    const { title, text, url } = buildShareContent(name, details);
 
     if (platform === "whatsapp") {
       window.open(
@@ -659,13 +660,18 @@ document.addEventListener("DOMContentLoaded", () => {
       );
     } else if (platform === "email") {
       window.location.href = `mailto:?subject=${encodeURIComponent(
-        "Check out: " + name
+        title
       )}&body=${encodeURIComponent(text + "\n\n" + url)}`;
     } else if (platform === "copy") {
       navigator.clipboard
         .writeText(url)
         .then(() => showMessage("Link copied to clipboard!", "success"))
-        .catch(() => showMessage("Could not copy link.", "error"));
+        .catch(() =>
+          showMessage(
+            "Unable to copy link. Please select and copy the URL manually.",
+            "error"
+          )
+        );
     }
   }
 
