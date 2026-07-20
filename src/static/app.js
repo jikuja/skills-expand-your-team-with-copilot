@@ -633,7 +633,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if (navigator.share) {
       navigator
-        .share({ title: name, text: text, url: url })
+        .share({ title: title, text: text, url: url })
         .catch(() => {
           // User cancelled or API unsupported — silently ignore
         });
