@@ -568,6 +568,16 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <div class="share-container">
+          <button class="share-button" aria-label="Share this activity" title="Share this activity">
+            🔗 Share
+          </button>
+          <div class="share-dropdown hidden">
+            <button class="share-option" data-share="whatsapp">💬 WhatsApp</button>
+            <button class="share-option" data-share="email">✉️ Email</button>
+            <button class="share-option" data-share="copy">📋 Copy Link</button>
+          </div>
+        </div>
       </div>
     `;
 
@@ -587,8 +597,84 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
+    // Add share button functionality
+    const shareButton = activityCard.querySelector(".share-button");
+    const shareDropdown = activityCard.querySelector(".share-dropdown");
+    shareButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      shareActivity(name, details, shareDropdown);
+    });
+
+    // Handle individual share options
+    const shareOptions = activityCard.querySelectorAll(".share-option");
+    shareOptions.forEach((option) => {
+      option.addEventListener("click", (event) => {
+        event.stopPropagation();
+        executeShare(option.dataset.share, name, details);
+        shareDropdown.classList.add("hidden");
+      });
+    });
+
     activitiesList.appendChild(activityCard);
   }
+
+  // Build a shareable text and URL for an activity
+  function buildShareContent(name, details) {
+    const schedule = formatSchedule(details);
+    const text = `Check out "${name}" at Mergington High School!\n${details.description}\nSchedule: ${schedule}`;
+    const url = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
+    return { text, url };
+  }
+
+  // Open share dropdown, or use native Web Share API if available
+  function shareActivity(name, details, dropdown) {
+    const { text, url } = buildShareContent(name, details);
+
+    if (navigator.share) {
+      navigator
+        .share({ title: name, text: text, url: url })
+        .catch(() => {
+          // User cancelled or API unsupported — silently ignore
+        });
+      return;
+    }
+
+    // Close all other open dropdowns first
+    document.querySelectorAll(".share-dropdown").forEach((d) => {
+      if (d !== dropdown) d.classList.add("hidden");
+    });
+
+    dropdown.classList.toggle("hidden");
+  }
+
+  // Execute a specific share action
+  function executeShare(platform, name, details) {
+    const { text, url } = buildShareContent(name, details);
+
+    if (platform === "whatsapp") {
+      window.open(
+        `https://wa.me/?text=${encodeURIComponent(text + "\n" + url)}`,
+        "_blank",
+        "noopener,noreferrer"
+      );
+    } else if (platform === "email") {
+      window.location.href = `mailto:?subject=${encodeURIComponent(
+        "Check out: " + name
+      )}&body=${encodeURIComponent(text + "\n\n" + url)}`;
+    } else if (platform === "copy") {
+      navigator.clipboard
+        .writeText(url)
+        .then(() => showMessage("Link copied to clipboard!", "success"))
+        .catch(() => showMessage("Could not copy link.", "error"));
+    }
+  }
+
+  // Close share dropdowns when clicking outside
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".share-dropdown").forEach((d) => {
+      d.classList.add("hidden");
+    });
+  });
 
   // Event listeners for search and filter
   searchInput.addEventListener("input", (event) => {
