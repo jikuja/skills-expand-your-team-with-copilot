@@ -25,6 +25,38 @@ document.addEventListener("DOMContentLoaded", () => {
   const closeLoginModal = document.querySelector(".close-login-modal");
   const loginMessage = document.getElementById("login-message");
 
+  // Dark mode elements
+  const darkModeToggle = document.getElementById("dark-mode-toggle");
+
+  // Initialize dark mode from localStorage
+  function initDarkMode() {
+    if (localStorage.getItem("darkMode") === "enabled") {
+      document.documentElement.setAttribute("data-theme", "dark");
+      darkModeToggle.textContent = "☀️";
+      darkModeToggle.setAttribute("aria-label", "Switch to light mode");
+    } else {
+      document.documentElement.removeAttribute("data-theme");
+      darkModeToggle.textContent = "🌙";
+      darkModeToggle.setAttribute("aria-label", "Switch to dark mode");
+    }
+  }
+
+  darkModeToggle.addEventListener("click", () => {
+    if (document.documentElement.getAttribute("data-theme") === "dark") {
+      document.documentElement.removeAttribute("data-theme");
+      localStorage.setItem("darkMode", "disabled");
+      darkModeToggle.textContent = "🌙";
+      darkModeToggle.setAttribute("aria-label", "Switch to dark mode");
+    } else {
+      document.documentElement.setAttribute("data-theme", "dark");
+      localStorage.setItem("darkMode", "enabled");
+      darkModeToggle.textContent = "☀️";
+      darkModeToggle.setAttribute("aria-label", "Switch to light mode");
+    }
+  });
+
+  initDarkMode();
+
   // Activity categories with corresponding colors
   const activityTypes = {
     sports: { label: "Sports", color: "#e8f5e9", textColor: "#2e7d32" },
