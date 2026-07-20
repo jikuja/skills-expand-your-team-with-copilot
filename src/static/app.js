@@ -626,7 +626,9 @@ document.addEventListener("DOMContentLoaded", () => {
     const schedule = formatSchedule(details);
     const shareTitle = `Check out "${name}" at ${SCHOOL_NAME}!`;
     const text = `${shareTitle}\n${details.description}\nSchedule: ${schedule}`;
-    const url = `${window.location.origin}${window.location.pathname}?activity=${encodeURIComponent(name)}`;
+    const params = new URLSearchParams(window.location.search);
+    params.set("activity", name);
+    const url = `${window.location.origin}${window.location.pathname}?${params.toString()}`;
     return { title: shareTitle, text, url };
   }
 
